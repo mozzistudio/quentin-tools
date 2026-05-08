@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import Link from 'next/link'
 import { Product, ProductWithResult } from '@/lib/excel'
 import StatsCards from '@/components/StatsCards'
 import PriceTable from '@/components/PriceTable'
@@ -104,8 +105,17 @@ export default function ComparadorPage() {
               </p>
             </div>
 
-            {/* Legend */}
+            {/* Legend + Docs link */}
             <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600">
+              <Link
+                href="/docs"
+                className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 font-medium text-gray-500 hover:border-blue-300 hover:text-blue-600 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Documentation
+              </Link>
               <span className="flex items-center gap-1.5">
                 <span className="h-3 w-3 rounded-sm bg-green-200" />
                 Amazon más barato
