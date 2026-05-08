@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 
 export const metadata = {
@@ -12,6 +13,13 @@ export default function DocsPage() {
       <header className="border-b border-gray-200 bg-white shadow-sm">
         <div className="mx-auto max-w-4xl px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="Logo"
+              width={32}
+              height={32}
+              className="rounded-full object-cover ring-2 ring-gray-200"
+            />
             <span className="text-lg font-bold text-gray-900">Quentin Tools</span>
             <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700">Docs</span>
           </div>

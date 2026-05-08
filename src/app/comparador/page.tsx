@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Product, ProductWithResult } from '@/lib/excel'
 import StatsCards from '@/components/StatsCards'
@@ -96,13 +97,22 @@ export default function ComparadorPage() {
       <header className="border-b border-gray-200 bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">
-                Comparador Amazon USA vs Proveedor
-              </h1>
-              <p className="text-sm text-gray-500">
-                Anker Brands · {products.length} productos · Precios en USD
-              </p>
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={40}
+                height={40}
+                className="rounded-full object-cover ring-2 ring-gray-200"
+              />
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">
+                  Comparador Amazon USA vs Proveedor
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Anker Brands · {products.length} productos · Precios en USD
+                </p>
+              </div>
             </div>
 
             {/* Legend + Docs link */}
