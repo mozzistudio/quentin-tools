@@ -126,6 +126,15 @@ export default function ComparadorPage() {
                 </svg>
                 Documentation
               </Link>
+              <Link
+                href="/plano"
+                className="flex items-center gap-1 rounded-md border border-gray-200 bg-white px-2.5 py-1.5 font-medium text-gray-500 hover:border-blue-300 hover:text-blue-600 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4z M4 10h16 M10 10v10" />
+                </svg>
+                Plano 3D
+              </Link>
               <span className="flex items-center gap-1.5">
                 <span className="h-3 w-3 rounded-sm bg-green-200" />
                 Amazon más barato
