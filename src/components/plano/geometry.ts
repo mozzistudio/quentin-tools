@@ -81,3 +81,59 @@ export const TOTAL_AREA = ROOMS.reduce((sum, r) => sum + r.a, 0); // 26,81 con e
 
 /** Color convencional de obra nueva. */
 export const OBRA = 0xc23b1e;
+
+export type ViewKey = 'sala' | 'cocina' | 'cuarto' | 'bano';
+
+/**
+ * Cámaras de los renders. Cada imagen de ambiente se toma desde uno de estos
+ * puntos, dentro de la geometría: es lo que permite comprobar que el render
+ * y el modelo describen la misma coca.
+ *
+ * Orientación: +X = este, +Z = sur. Mirando al sur, el oeste queda a la
+ * derecha; mirando al norte, el este queda a la derecha.
+ */
+export interface Viewpoint {
+  key: ViewKey;
+  label: string;
+  /** Posición del ojo, en metros. */
+  eye: [number, number, number];
+  /** Punto mirado. */
+  look: [number, number, number];
+  fov: number;
+}
+
+const VEYE = 1.55;
+
+export const VIEWPOINTS: Viewpoint[] = [
+  {
+    key: 'sala',
+    label: 'Sala',
+    eye: [1.85, VEYE, ZB2 + 0.2],
+    look: [1.85, 1.15, ZK2],
+    fov: 58,
+  },
+  {
+    // Frontal del frente de cocina: hay que retroceder al fondo de la sala
+    // para que entren los 3,32 m de un tirón.
+    key: 'cocina',
+    label: 'Cocina',
+    eye: [(XI0 + XI1) / 2, VEYE, ZB2 + 0.12],
+    look: [(XI0 + XI1) / 2, 1.25, ZK2],
+    fov: 42,
+  },
+  {
+    key: 'cuarto',
+    label: 'Cuarto',
+    eye: [1.9, VEYE, ZC1 - 0.19],
+    look: [1.5, 1.05, ZI0],
+    fov: 64,
+  },
+  {
+    // Con 2,74 m² no cabe cámara dentro: se mira desde el hueco del pasillo.
+    key: 'bano',
+    label: 'Baño',
+    eye: [XH1 - 0.175, 1.5, (BDZ0 + BDZ1) / 2],
+    look: [XI1, 0.95, ZP + 0.4],
+    fov: 62,
+  },
+];

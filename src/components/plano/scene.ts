@@ -1,9 +1,9 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import {
-  BDZ0, BDZ1, CX, CZ, DOOR_H, DW, H, OBRA, ROOMS, WHEAD, WSILL, WZ0, WZ1,
+  BDZ0, BDZ1, CX, CZ, DOOR_H, DW, H, OBRA, ROOMS, VIEWPOINTS, WHEAD, WSILL, WZ0, WZ1,
   X0, X1, XH1, XH2, XI0, XI1, Z0, Z1, ZB1, ZB2, ZC1, ZI0, ZK2, ZP, ZS2,
-  type RoomKey,
+  type RoomKey, type ViewKey,
 } from './geometry'
 
 export type CameraPreset = 'persp' | 'iso' | 'plan'
@@ -11,6 +11,8 @@ export type WallMode = 'full' | 'cut' | 'none'
 
 export interface PlanoScene {
   setCamera(preset: CameraPreset): void
+  /** Cámara de render: ojo a 1,55 m dentro de la coca, muros completos. */
+  setViewpoint(key: ViewKey): void
   setWalls(mode: WallMode): void
   setFurnished(on: boolean): void
   setDims(on: boolean): void
@@ -62,7 +64,9 @@ export function createPlanoScene(
   scene.background = new THREE.Color(0xe9ecf0)
   scene.fog = new THREE.Fog(0xe9ecf0, 26, 52)
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true })
+  // preserveDrawingBuffer: permite exportar los puntos de vista con toDataURL,
+  // que es como se sacan los renders de ambiente a partir del modelo.
+  const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
   renderer.setSize(host.clientWidth, host.clientHeight)
   renderer.outputColorSpace = THREE.SRGBColorSpace
@@ -631,6 +635,21 @@ export function createPlanoScene(
   window.addEventListener('resize', onResize)
 
   /* -------------------------------------------------------------- cámara */
+  let inViewpoint = false
+
+  /** Devuelve la cámara a su estado de maqueta al salir de un punto de vista. */
+  function leaveViewpoint() {
+    if (!inViewpoint) return
+    inViewpoint = false
+    ceiling.visible = false
+    walkAmb.visible = false
+    controls.minDistance = 2.2
+    camera.fov = 42
+    camera.updateProjectionMatrix()
+    gDims.visible = savedDims
+    gLabels.visible = savedLabels
+  }
+
   let tween: { p0: THREE.Vector3; p1: THREE.Vector3; t0: THREE.Vector3; t1: THREE.Vector3; s: number } | null = null
   function flyTo(p: [number, number, number], t: [number, number, number]) {
     tween = {
@@ -676,6 +695,7 @@ export function createPlanoScene(
   return {
     setCamera(preset) {
       if (walking) return
+      leaveViewpoint()
       if (preset === 'persp') {
         controls.maxPolarAngle = Math.PI / 2 - 0.02
         flyTo([CX + 5.4, 6.5, Z1 + 3.6], [CX, 0.9, CZ])
@@ -686,6 +706,22 @@ export function createPlanoScene(
         controls.maxPolarAngle = Math.PI
         flyTo([CX, 12.6, CZ + 0.02], [CX, 0, CZ])
       }
+    },
+    setViewpoint(key) {
+      if (walking) return
+      const v = VIEWPOINTS.find((p) => p.key === key)
+      if (!v) return
+      inViewpoint = true
+      gDims.visible = false
+      gLabels.visible = false
+      ceiling.visible = true
+      walkAmb.visible = true
+      controls.minDistance = 0.05
+      controls.maxPolarAngle = Math.PI / 2 - 0.02
+      camera.fov = v.fov
+      camera.updateProjectionMatrix()
+      applyCutAll(H + 0.01)
+      flyTo(v.eye, v.look)
     },
     setWalls(mode) {
       applyCutAll(mode === 'full' ? H + 0.01 : mode === 'cut' ? CUT_HEIGHT : 0)
@@ -702,14 +738,15 @@ export function createPlanoScene(
       applyCutAll(currentCut)
     },
     setDims(on) {
-      gDims.visible = on
+      gDims.visible = on && !inViewpoint
       if (!walking) savedDims = on
     },
     setLabels(on) {
-      gLabels.visible = on
+      gLabels.visible = on && !inViewpoint
       if (!walking) savedLabels = on
     },
     setWalking(on) {
+      leaveViewpoint()
       walking = on
       controls.enabled = !on
       ceiling.visible = on
@@ -750,6 +787,7 @@ export function createPlanoScene(
     },
     focusRoom(key) {
       if (walking) return
+      leaveViewpoint()
       const room = ROOMS.find((r) => r.key === key)
       if (!room) return
       flyTo([room.cx + 3.4, 4.6, room.cz + 4.2], [room.cx, 0.6, room.cz])

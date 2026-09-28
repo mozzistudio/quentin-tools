@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { ROOMS, type RoomKey } from './geometry'
+import { ROOMS, VIEWPOINTS, type RoomKey, type ViewKey } from './geometry'
 import { createPlanoScene, type CameraPreset, type PlanoScene, type WallMode } from './scene'
 
 const CAMERAS: Array<{ id: CameraPreset; label: string }> = [
@@ -61,6 +61,7 @@ export default function PlanoViewer() {
   const knobRef = useRef<HTMLSpanElement | null>(null)
 
   const [camera, setCamera] = useState<CameraPreset>('persp')
+  const [view, setView] = useState<ViewKey | null>(null)
   const [walls, setWalls] = useState<WallMode>('cut')
   const [furnished, setFurnished] = useState(true)
   const [dims, setDims] = useState(true)
@@ -78,6 +79,7 @@ export default function PlanoViewer() {
         setWalking(false)
         setWalls('cut')
         setCamera('persp')
+        setView(null)
       },
       setLocked,
     )
@@ -88,7 +90,12 @@ export default function PlanoViewer() {
     }
   }, [])
 
+  const pickView = (id: ViewKey) => {
+    setView(id)
+    sceneRef.current?.setViewpoint(id)
+  }
   const pickCamera = (id: CameraPreset) => {
+    setView(null)
     setCamera(id)
     sceneRef.current?.setCamera(id)
     if (id === 'plan') {
@@ -105,6 +112,7 @@ export default function PlanoViewer() {
     sceneRef.current?.setFurnished(on)
   }
   const enterWalk = (on: boolean) => {
+    setView(null)
     setWalking(on)
     sceneRef.current?.setWalking(on)
     if (!on) {
@@ -146,7 +154,7 @@ export default function PlanoViewer() {
         <div className="pointer-events-auto">
           <Segmented>
             {CAMERAS.map((c) => (
-              <Seg key={c.id} active={camera === c.id && !walking} disabled={walking} onClick={() => pickCamera(c.id)}>
+              <Seg key={c.id} active={camera === c.id && !walking && !view} disabled={walking} onClick={() => pickCamera(c.id)}>
                 {c.label}
               </Seg>
             ))}
@@ -154,8 +162,17 @@ export default function PlanoViewer() {
         </div>
         <div className="pointer-events-auto">
           <Segmented>
+            {VIEWPOINTS.map((v) => (
+              <Seg key={v.key} active={view === v.key} disabled={walking} onClick={() => pickView(v.key)}>
+                {v.label}
+              </Seg>
+            ))}
+          </Segmented>
+        </div>
+        <div className="pointer-events-auto">
+          <Segmented>
             {WALLS.map((w) => (
-              <Seg key={w.id} active={walls === w.id} disabled={walking} onClick={() => pickWalls(w.id)}>
+              <Seg key={w.id} active={walls === w.id && !view} disabled={walking || !!view} onClick={() => pickWalls(w.id)}>
                 {w.label}
               </Seg>
             ))}
@@ -175,10 +192,10 @@ export default function PlanoViewer() {
         </div>
         <div className="pointer-events-auto">
           <Segmented>
-            <Seg active={dims} disabled={walking} onClick={() => { setDims(!dims); sceneRef.current?.setDims(!dims) }}>
+            <Seg active={dims && !view} disabled={walking || !!view} onClick={() => { setDims(!dims); sceneRef.current?.setDims(!dims) }}>
               Cotas
             </Seg>
-            <Seg active={labels} disabled={walking} onClick={() => { setLabels(!labels); sceneRef.current?.setLabels(!labels) }}>
+            <Seg active={labels && !view} disabled={walking || !!view} onClick={() => { setLabels(!labels); sceneRef.current?.setLabels(!labels) }}>
               Rótulos
             </Seg>
           </Segmented>
@@ -186,7 +203,7 @@ export default function PlanoViewer() {
       </div>
 
       {/* Leyenda */}
-      {!walking && (
+      {!walking && !view && (
         <div className="absolute bottom-3 left-3 z-30 grid max-w-[190px] gap-1 rounded-lg border border-gray-200 bg-white/95 p-3 shadow-sm">
           <h3 className="font-mono text-[10px] font-medium uppercase tracking-widest text-gray-400">Ambientes</h3>
           {ROOMS.map((r) => (
@@ -195,7 +212,7 @@ export default function PlanoViewer() {
               type="button"
               onMouseEnter={() => sceneRef.current?.highlight(r.key as RoomKey, true)}
               onMouseLeave={() => sceneRef.current?.highlight(r.key as RoomKey, false)}
-              onClick={() => sceneRef.current?.focusRoom(r.key as RoomKey)}
+              onClick={() => { setView(null); sceneRef.current?.focusRoom(r.key as RoomKey) }}
               className="flex items-center gap-2 text-left text-xs text-gray-700 hover:text-gray-950"
             >
               <span
@@ -248,7 +265,7 @@ export default function PlanoViewer() {
         </div>
       )}
 
-      {!walking && (
+      {!walking && !view && (
         <div className="absolute bottom-3 right-3 z-30 hidden rounded-lg border border-gray-200 bg-white/95 px-2.5 py-1.5 font-mono text-[10px] text-gray-500 sm:block">
           arrastrar · girar &nbsp;|&nbsp; rueda · zoom &nbsp;|&nbsp; ⇧+arrastrar · desplazar
         </div>

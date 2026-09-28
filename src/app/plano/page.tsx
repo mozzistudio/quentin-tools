@@ -47,10 +47,10 @@ const FINISHES = [
 ]
 
 const RENDERS = [
-  ['/plano/sala.jpg', 'Sala hacia la cocina', 'Sofá de lino azul grisáceo con cojines ocre, alfombra ocre, mesa de roble pegada a la nueva ventana y lámpara de latón encima.'],
-  ['/plano/cocina.jpg', 'Cocina abierta', 'Frente único de 3,32 m: nevera integrada al extremo, encimera de cuarzo blanco arena, alicatado de gres verde azulado, dos baldas de roble.'],
-  ['/plano/cuarto.jpg', 'Cuarto', 'Cama con cabecero de roble contra el muro oeste, armario a techo en lacado verde oliva con tiradores de latón, suelo de roble de lama ancha.'],
-  ['/plano/bano.jpg', 'Baño', 'Ducha de obra a toda la profundidad, gres verde azulado, panel fijo de vidrio, mueble suspendido de roble y grifería de latón envejecido.'],
+  ['/plano/sala.jpg', 'Sala hacia la cocina', 'Vista desde el fondo norte de la sala. Mesa de roble pegada a la nueva ventana con la lámpara de latón encima, sofá de lino azul grisáceo contra el muro oeste, alfombra ocre en el paso y el frente de cocina al fondo.'],
+  ['/plano/cocina.jpg', 'Cocina abierta', 'Frente único de 3,32 m, de este a oeste: módulos altos, dos baldas de roble y la nevera integrada al extremo. Encimera de cuarzo blanco arena, alicatado de gres verde azulado y microcemento bajo los 0,68 m de la banda.'],
+  ['/plano/cuarto.jpg', 'Cuarto', 'Cama con cabecero de roble contra el muro oeste, mesilla al este y armario a techo en lacado verde oliva con tiradores de latón. Sin ventana: el croquis no dibuja ninguna.'],
+  ['/plano/bano.jpg', 'Baño', 'Vista desde el hueco del pasillo, los 2,14 × 1,28 de un vistazo. Ducha de obra al este a toda la profundidad, lavabo e inodoro contra el tabique del cuarto, grifería de latón envejecido.'],
 ]
 
 const DECISIONS: Array<{ title: string; body: string; accent?: boolean }> = [
@@ -164,8 +164,9 @@ export default function PlanoPage() {
             ))}
           </div>
           <p className="mt-4 border-t border-gray-200 pt-3 font-mono text-xs leading-relaxed text-gray-400">
-            Los renders fijan materiales, color y luz. La geometría exacta es la del modelo 3D: el render
-            del cuarto añade una ventana que el croquis no dibuja.
+            Cada render sale de uno de los cuatro puntos de vista del modelo — los botones «Sala», «Cocina»,
+            «Cuarto» y «Baño» de la barra: misma posición de cámara, mismos muros, mismos muebles. Los
+            renders sólo añaden materiales, color y luz.
           </p>
         </section>
 
